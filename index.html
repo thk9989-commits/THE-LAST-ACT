@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>THE LAST ACT - Acts 1-6</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="screen">
+      <div class="scanlines" aria-hidden="true"></div>
+      <div class="noise hidden" id="noiseLayer" aria-hidden="true"></div>
+
+      <section class="intro" id="intro">
+        <h1>THE LAST ACT</h1>
+        <p>Scene 1: The Awakening</p>
+        <button id="startButton" type="button">Boot Sequence</button>
+      </section>
+
+      <section class="stage hidden" id="stage">
+        <header class="portrait-wrap">
+          <figure class="portrait glitch" id="portrait" aria-label="Man in shadows">
+            <div class="eyes"></div>
+            <div class="mouth" id="mouth"></div>
+          </figure>
+        </header>
+
+        <div class="terminal">
+          <aside class="debt-hud hidden" id="debtHud">
+            <p class="hud-label">Amount Owed</p>
+            <p class="hud-amount" id="debtAmount">$500,000</p>
+            <div class="pouch-bar" aria-hidden="true">
+              <div class="pouch-fill" id="pouchFill"></div>
+            </div>
+            <p class="hud-hits" id="ravenHits">Raven Hits: 0 / 5</p>
+          </aside>
+
+          <p class="status" id="status">[ CONNECTION ESTABLISHED ]</p>
+          <div class="dialogue" id="dialogue" aria-live="polite"></div>
+
+          <section class="challenge hidden" id="challenge">
+            <p class="challenge-title">THE DATA SET:</p>
+            <pre class="data-table">ARMY: 04
+NAVY: 04
+NASA: 04
+AFSC: 04
+UFO: ??</pre>
+            <p class="challenge-text">X = (Computers Hacked - Year of Arrest Last Two Digits)</p>
+            <label for="decryptKey">FINAL KEY</label>
+            <div class="challenge-row">
+              <input id="decryptKey" type="text" inputmode="numeric" maxlength="4" autocomplete="off" />
+              <button id="submitKey" type="button">Transmit</button>
+            </div>
+            <p class="challenge-feedback" id="challengeFeedback"></p>
+          </section>
+
+          <section class="frequency-puzzle hidden" id="frequencyPuzzle">
+            <p class="challenge-title">SIGNAL MASK MODULE</p>
+            <div class="freq-grid">
+              <article class="freq-card">
+                <p class="freq-label">Clue Signal</p>
+                <canvas id="targetWave" width="300" height="80" aria-label="Target frequency wave"></canvas>
+                <p class="freq-value" id="targetValue">1540 Hz</p>
+              </article>
+              <article class="freq-card">
+                <p class="freq-label">Mask Signal</p>
+                <canvas id="playerWave" width="300" height="80" aria-label="Player frequency wave"></canvas>
+                <p class="freq-value" id="playerValue">1 Hz</p>
+              </article>
+            </div>
+            <p class="freq-instruction">Tune the dial from 1 to 2000 Hz until both waveforms align.</p>
+            <div class="dial-wrap">
+              <div class="dial" id="dialVisual" aria-hidden="true">
+                <div class="dial-needle" id="dialNeedle"></div>
+              </div>
+              <input id="frequencyDial" type="range" min="1" max="2000" value="1" />
+              <div class="dial-scale">
+                <span>1 Hz</span>
+                <span>2000 Hz</span>
+              </div>
+            </div>
+            <button id="lockFrequency" type="button">Lock Frequency</button>
+            <p class="challenge-feedback" id="frequencyFeedback"></p>
+          </section>
+
+          <section class="smuggler-room hidden" id="smugglerRoom">
+            <p class="challenge-title">FIREWALL SMUGGLER ROOM</p>
+            <p class="room-text">Collect all seven artifacts, then complete the spoofing chain to forge passage through 70 firewalls.</p>
+            <p class="inventory-count" id="inventoryCount">Artifacts collected: 0 / 7</p>
+
+            <div class="item-grid" id="itemGrid">
+              <button class="item-chip" type="button" data-item="modem">14.4k Modem Shunt</button>
+              <button class="item-chip" type="button" data-item="bluebox">Blue Box Frequency Generator</button>
+              <button class="item-chip" type="button" data-item="hexkey">Hex-Editor Key</button>
+              <button class="item-chip" type="button" data-item="floppy">De-gaussed Floppy Disk</button>
+              <button class="item-chip" type="button" data-item="lazarus">Lazarus Handshake Protocol</button>
+              <button class="item-chip" type="button" data-item="atari">Atari 800XL Logic Board</button>
+              <button class="item-chip" type="button" data-item="coords">Non-Terrestrial Coordinate Map</button>
+            </div>
+
+            <article class="item-detail" id="itemDetail">Select an artifact to inspect.</article>
+
+            <div class="smuggler-quiz">
+              <label class="quiz-row" for="answerTrusted">Trusted Friend ID (1+2+3)</label>
+              <input id="answerTrusted" type="text" inputmode="numeric" autocomplete="off" />
+
+              <label class="quiz-row" for="answerPacket">4th Packet from 1200, 2400, 3600</label>
+              <input id="answerPacket" type="text" inputmode="numeric" autocomplete="off" />
+
+              <label class="quiz-row" for="answerGhost">Ghost Riddle (8 letters)</label>
+              <input id="answerGhost" type="text" autocomplete="off" />
+
+              <label class="quiz-row" for="answerA">Q1 Value A (10.0.0.5, 10, 20, ?)</label>
+              <input id="answerA" type="text" inputmode="numeric" autocomplete="off" />
+
+              <label class="quiz-row" for="answerB">Q2 Value B (1024 cap, 250/burst)</label>
+              <input id="answerB" type="text" inputmode="numeric" autocomplete="off" />
+
+              <label class="quiz-row" for="answerC">Q3 Value C (ISN 3600, +1200 x 2)</label>
+              <input id="answerC" type="text" inputmode="numeric" autocomplete="off" />
+
+              <label class="quiz-row" for="answerD">Q4 Value D (KEVIN sum)</label>
+              <input id="answerD" type="text" inputmode="numeric" autocomplete="off" />
+
+              <label class="quiz-row" for="answerE">Q5 Value E ((1995 / 5) + 114)</label>
+              <input id="answerE" type="text" inputmode="numeric" autocomplete="off" />
+
+              <label class="quiz-row" for="answerF">Q6 Value F (ACKNOWLEDGEMENT first 3)</label>
+              <input id="answerF" type="text" autocomplete="off" />
+            </div>
+
+            <button id="submitSmuggler" type="button">Assemble Smuggler Key</button>
+            <p class="challenge-feedback" id="smugglerFeedback"></p>
+          </section>
+
+          <section class="merchant-room hidden" id="merchantRoom">
+            <p class="challenge-title">THE TRADER</p>
+            <div class="merchant-layout">
+              <div class="merchant-portrait" aria-hidden="true">
+                <div class="merchant-eyes"></div>
+                <div class="merchant-mouth"></div>
+              </div>
+              <div>
+                <p class="merchant-text">A tiny USB sits on the desk. It can bypass to the final level instantly.</p>
+                <p class="merchant-text" id="merchantLine">The trader starts at $500,000 and argues why you should pay.</p>
+              </div>
+            </div>
+
+            <div class="fallacy-panel">
+              <p class="fallacy-round" id="fallacyRound">Raven Hit 1 / 5</p>
+              <p class="fallacy-claim" id="fallacyClaim"></p>
+              <div class="fallacy-options" id="fallacyOptions">
+                <button type="button" data-fallacy="ad_hominem">Ad Hominem</button>
+                <button type="button" data-fallacy="false_dilemma">False Dilemma</button>
+                <button type="button" data-fallacy="bandwagon">Bandwagon</button>
+                <button type="button" data-fallacy="appeal_fear">Appeal to Fear</button>
+                <button type="button" data-fallacy="circular_reasoning">Circular Reasoning</button>
+              </div>
+              <p class="challenge-feedback" id="merchantFeedback"></p>
+            </div>
+          </section>
+
+          <section class="safehaven-room hidden" id="safehavenRoom">
+            <p class="challenge-title">SAFEHAVEN: RESERVE SWITCHBOARD</p>
+            <div class="safehaven-layout">
+              <div class="smuggler-speaker">
+                <div class="smuggler-face" id="smugglerFace" aria-hidden="true">
+                  <div class="smuggler-eyes"></div>
+                  <div class="smuggler-mouth" id="smugglerMouth"></div>
+                </div>
+                <p class="smuggler-speech" id="smugglerSpeech">Incoming transport channel...</p>
+              </div>
+              <div class="threat-panel">
+                <p class="threat-title">Outside Threat: Trojan Swarm</p>
+                <div class="threat-track" aria-hidden="true">
+                  <div class="threat-wave" id="threatWave"></div>
+                </div>
+                <p class="switch-progress" id="switchProgress">Switches armed: 0 / 3</p>
+              </div>
+            </div>
+
+            <div class="switch-grid">
+              <article class="switch-card" id="switchCard1">
+                <p class="switch-title">Switch 01: Susan Thunder Lock</p>
+                <p class="switch-question">02, 05, 08, ?</p>
+                <p class="switch-state" id="switchState1">OFF</p>
+                <div class="switch-row">
+                  <input id="switchInput1" type="text" inputmode="numeric" autocomplete="off" placeholder="2-digit code" />
+                  <button id="switchBtn1" type="button">Flip Switch</button>
+                </div>
+              </article>
+
+              <article class="switch-card" id="switchCard2">
+                <p class="switch-title">Switch 02: ILOVEYOU Spread Gate</p>
+                <p class="switch-question">50 x 50 x 50 = ?</p>
+                <p class="switch-state" id="switchState2">OFF</p>
+                <div class="switch-row">
+                  <input id="switchInput2" type="text" inputmode="numeric" autocomplete="off" placeholder="generation value" />
+                  <button id="switchBtn2" type="button">Flip Switch</button>
+                </div>
+              </article>
+
+              <article class="switch-card" id="switchCard3">
+                <p class="switch-title">Switch 03: FACE Hex Backdoor</p>
+                <p class="switch-question">F-A-C-E as 2-digit pairs</p>
+                <p class="switch-state" id="switchState3">OFF</p>
+                <div class="switch-row">
+                  <input id="switchInput3" type="text" autocomplete="off" placeholder="8-digit string" />
+                  <button id="switchBtn3" type="button">Flip Switch</button>
+                </div>
+              </article>
+            </div>
+
+            <button id="reservePowerBtn" type="button" disabled>Route Reserve Power</button>
+            <p class="challenge-feedback" id="safehavenFeedback"></p>
+          </section>
+
+          <p class="prompt" id="prompt">_</p>
+        </div>
+      </section>
+    </main>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
