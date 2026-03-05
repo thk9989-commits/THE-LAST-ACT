@@ -49,6 +49,10 @@ body.act-six {
   background: radial-gradient(circle at 50% 15%, #1a3f1a 0%, #08130b 64%);
 }
 
+body.act-seven {
+  background: radial-gradient(circle at 50% 15%, #082534 0%, #04090f 65%);
+}
+
 .screen {
   min-height: 100vh;
   display: grid;
@@ -183,6 +187,12 @@ body.act-six .stage {
   border-color: #7dff88;
   background: rgba(7, 22, 9, 0.9);
   box-shadow: 0 0 28px rgba(125, 255, 136, 0.18);
+}
+
+body.act-seven .stage {
+  border-color: #72d6ff;
+  background: rgba(4, 13, 20, 0.9);
+  box-shadow: 0 0 28px rgba(114, 214, 255, 0.2);
 }
 
 body.malfunction .stage {
@@ -358,6 +368,83 @@ body.malfunction .portrait {
   padding: 1.2rem;
 }
 
+.logic-toolbar {
+  display: flex;
+  justify-content: flex-start;
+}
+
+#logicButton {
+  border-color: #86b9ff;
+  color: #c8dfff;
+  letter-spacing: 0.05em;
+}
+
+#logicButton:hover,
+#logicButton:focus-visible {
+  background: #86b9ff;
+  color: #00111f;
+}
+
+.logic-panel {
+  border: 1px solid rgba(134, 185, 255, 0.7);
+  background: rgba(2, 9, 20, 0.95);
+  padding: 0.9rem;
+  max-height: 44vh;
+  overflow-y: auto;
+}
+
+.logic-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+
+.logic-title {
+  margin: 0;
+  color: #bdd9ff;
+  font-weight: 700;
+}
+
+#logicClose {
+  border-color: #86b9ff;
+  color: #c8dfff;
+  padding: 0.45rem 0.7rem;
+}
+
+#logicClose:hover,
+#logicClose:focus-visible {
+  background: #86b9ff;
+  color: #00111f;
+}
+
+.logic-block {
+  border: 1px solid rgba(134, 185, 255, 0.35);
+  background: rgba(5, 15, 30, 0.65);
+  padding: 0.75rem;
+  margin-bottom: 0.65rem;
+}
+
+.logic-block:last-child {
+  margin-bottom: 0;
+}
+
+.logic-block-title {
+  margin: 0 0 0.45rem;
+  color: #a9ddff;
+  font-weight: 700;
+}
+
+.logic-block p {
+  margin: 0 0 0.45rem;
+  line-height: 1.4;
+}
+
+.logic-block p:last-child {
+  margin-bottom: 0;
+}
+
 .debt-hud {
   position: absolute;
   top: 1rem;
@@ -455,7 +542,8 @@ body.malfunction .status {
 .frequency-puzzle,
 .smuggler-room,
 .merchant-room,
-.safehaven-room {
+.safehaven-room,
+.final-room {
   margin: 0;
   border: 1px solid rgba(100, 236, 255, 0.55);
   background: rgba(2, 12, 35, 0.65);
@@ -617,7 +705,8 @@ canvas {
 
 .smuggler-room,
 .merchant-room,
-.safehaven-room {
+.safehaven-room,
+.final-room {
   width: 100%;
 }
 
@@ -986,4 +1075,101 @@ canvas {
     grid-template-columns: 1fr;
     flex-direction: column;
   }
+
+  .logic-toolbar {
+    width: 100%;
+  }
+
+  #logicButton,
+  #logicClose {
+    width: 100%;
+  }
+
+  .logic-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .logic-panel {
+    max-height: 52vh;
+  }
 }
+body.act-seven .challenge-title {
+  color: #9fdfff;
+}
+
+body.act-seven .status {
+  color: #9fdfff;
+}
+
+body.act-seven .final-room {
+  border-color: rgba(114, 214, 255, 0.75);
+  background: rgba(5, 16, 26, 0.84);
+}
+
+body.act-seven #restartButton {
+  border-color: #72d6ff;
+  color: #9fdfff;
+}
+
+body.act-seven #restartButton:hover,
+body.act-seven #restartButton:focus-visible {
+  background: #72d6ff;
+  color: #01131e;
+}
+
+body.act-seven input {
+  border-color: #5eaed4;
+  background: #05131c;
+  color: #d8f2ff;
+}
+
+.final-snippet {
+  margin: 0 0 0.8rem;
+  border: 1px solid rgba(114, 214, 255, 0.45);
+  background: rgba(3, 11, 17, 0.85);
+  color: #9fdfff;
+  padding: 0.8rem;
+  overflow-x: auto;
+}
+
+.final-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 0 0 0.8rem;
+}
+
+.final-tools button,
+#sealDoomBtn,
+#restartButton {
+  border-color: #72d6ff;
+  color: #9fdfff;
+}
+
+.final-tools button:hover,
+.final-tools button:focus-visible,
+#sealDoomBtn:hover,
+#sealDoomBtn:focus-visible,
+#restartButton:hover,
+#restartButton:focus-visible {
+  background: #72d6ff;
+  color: #01131e;
+}
+
+.final-console {
+  margin: 0 0 0.8rem;
+  border: 1px solid rgba(114, 214, 255, 0.45);
+  background: rgba(2, 10, 15, 0.9);
+  color: #c8efff;
+  padding: 0.75rem;
+  min-height: 3.2rem;
+  line-height: 1.4;
+}
+
+.final-riddle {
+  color: #b8e8ff;
+  font-style: italic;
+}
+
+

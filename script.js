@@ -59,6 +59,19 @@ const switchProgress = document.getElementById("switchProgress");
 const safehavenFeedback = document.getElementById("safehavenFeedback");
 const threatWave = document.getElementById("threatWave");
 const reservePowerBtn = document.getElementById("reservePowerBtn");
+const finalRoom = document.getElementById("finalRoom");
+const finalSnippet = document.getElementById("finalSnippet");
+const finalConsole = document.getElementById("finalConsole");
+const runDateAuditBtn = document.getElementById("runDateAudit");
+const readForensicsBtn = document.getElementById("readForensics");
+const doomKey = document.getElementById("doomKey");
+const sealDoomBtn = document.getElementById("sealDoomBtn");
+const doomFeedback = document.getElementById("doomFeedback");
+const finalLine = document.getElementById("finalLine");
+const restartButton = document.getElementById("restartButton");
+const logicButton = document.getElementById("logicButton");
+const logicPanel = document.getElementById("logicPanel");
+const logicClose = document.getElementById("logicClose");
 
 const switchInput1 = document.getElementById("switchInput1");
 const switchInput2 = document.getElementById("switchInput2");
@@ -127,6 +140,9 @@ const safeSwitchAnswers = {
   3: "15101214"
 };
 
+const MYDOOM_SPREAD_END = "20040212";
+const MYDOOM_SPREAD_END_UNIX = 1076544000;
+
 let audioContext;
 let fanOsc;
 let fanGain;
@@ -139,6 +155,10 @@ let actFiveStarted = false;
 let actFiveSolved = false;
 let actSixStarted = false;
 let actSixSolved = false;
+let actSevenStarted = false;
+let actSevenSolved = false;
+let finalAuditRan = false;
+let finalForensicsRead = false;
 let debtAmount = STARTING_DEBT;
 let ravenHits = 0;
 let currentClaimIndex = 0;
@@ -404,6 +424,112 @@ function normalizeText(value) {
   return value.trim().toLowerCase();
 }
 
+function sanitizeDateKey(value) {
+  return value.replace(/\D/g, "").slice(0, 8);
+}
+
+function setFinalConsole(text, isWarning = false) {
+  finalConsole.textContent = text;
+  finalConsole.classList.toggle("warning", isWarning);
+}
+
+function setLogicPanel(open) {
+  logicPanel.classList.toggle("hidden", !open);
+  logicButton.setAttribute("aria-expanded", String(open));
+}
+
+function resetFinalActState() {
+  actSevenSolved = false;
+  finalAuditRan = false;
+  finalForensicsRead = false;
+
+  doomKey.value = "";
+  doomKey.disabled = false;
+  sealDoomBtn.disabled = false;
+  runDateAuditBtn.disabled = false;
+  readForensicsBtn.disabled = false;
+  restartButton.disabled = true;
+
+  doomFeedback.textContent = "";
+  doomFeedback.classList.remove("warning");
+
+  finalSnippet.textContent = "if (systemDate > \"YYYYMMDD\") { return; }";
+  finalLine.textContent = "Awaiting final transmission. Restoration sequence pending...";
+  setFinalConsole("Awaiting final command.");
+}
+
+function runDateAudit() {
+  finalAuditRan = true;
+  runDateAuditBtn.disabled = true;
+
+  setFinalConsole(
+    "[AUDIT] Release Window: January 2004 | Spread Halt: 2004-02-12 | Epoch: 1076544000. Date-gated propagation confirmed."
+  );
+}
+
+function readForensics() {
+  finalForensicsRead = true;
+  readForensicsBtn.disabled = true;
+
+  setFinalConsole(
+    "[FORENSICS] Estimated global damage exceeded $38B. The mass-mailing branch includes a hard stop; once the threshold date is crossed, spread logic exits."
+  );
+}
+
+function validateDoomKey() {
+  if (actSevenSolved) {
+    return;
+  }
+
+  const key = sanitizeDateKey(doomKey.value);
+  doomKey.value = key;
+
+  if (!finalAuditRan || !finalForensicsRead) {
+    doomFeedback.classList.add("warning");
+    doomFeedback.textContent = "Run both forensic tools before committing the final line.";
+    setFinalConsole("[BLOCKED] Missing prerequisites: audit and forensic readout are required.", true);
+    return;
+  }
+
+  if (key.length !== 8) {
+    doomFeedback.classList.add("warning");
+    doomFeedback.textContent = "Invalid format. Enter an 8-digit date in YYYYMMDD.";
+    setFinalConsole("[REJECTED] Date token malformed.", true);
+    return;
+  }
+
+  if (key !== MYDOOM_SPREAD_END) {
+    doomFeedback.classList.add("warning");
+    doomFeedback.textContent = "Seal denied. The date does not match the MyDoom.A spread cutoff.";
+
+    const relation = key < MYDOOM_SPREAD_END ? "earlier than" : "later than";
+    setFinalConsole(`[REJECTED] ${key} is ${relation} the historical cutoff ${MYDOOM_SPREAD_END}.`, true);
+    return;
+  }
+
+  actSevenSolved = true;
+  doomKey.disabled = true;
+  sealDoomBtn.disabled = true;
+  restartButton.disabled = false;
+
+  doomFeedback.classList.remove("warning");
+  doomFeedback.textContent = "Final line accepted. MyDoom.A spread phase terminated; restoration cascade started.";
+
+  finalSnippet.textContent = "000";
+  setFinalConsole(
+    `[SEALED] Drop-dead date ${MYDOOM_SPREAD_END} committed. Propagation exited at epoch ${MYDOOM_SPREAD_END_UNIX}. Restoration completed. Final state: 000.`
+  );
+  statusLabel.textContent = "[ MYDOOM.A SPREAD PHASE: TERMINATED ]";
+  finalLine.textContent = "MyDoom has faded. Infected code has recoded itself to normal. Final line: 000.";
+
+  addLine("[SYSTEM]: Drop-dead condition evaluated TRUE.");
+  addLine("[SYSTEM]: Mass-mailing routine terminated by internal date gate.");
+  addLine("[SYSTEM]: Infected code blocks are self-restoring to verified clean states.");
+  addLine("[SYSTEM]: Final line committed -> 000");
+  addLine("[ANONYMOUS]: No further spread. The last act is complete.");
+  playVentHiss();
+}
+
 function lockSmugglerRoom() {
   itemButtons.forEach((button) => {
     button.disabled = true;
@@ -508,6 +634,9 @@ async function activateReservePower() {
 
   addLine("[SYSTEM]: CPU, RAM, and storage shields are online in safehaven mode.");
   addLine("[SMUGGLER]: Bridge Room 2 is now available.");
+
+  await wait(1600);
+  await runActSeven();
 }
 
 async function finishActFour() {
@@ -699,6 +828,7 @@ async function runActThree() {
   safehavenRoom.classList.add("hidden");
   frequencyPuzzle.classList.add("hidden");
   debtHud.classList.add("hidden");
+  finalRoom.classList.add("hidden");
 
   document.body.classList.remove("act-two");
   document.body.classList.remove("act-four");
@@ -745,6 +875,7 @@ async function runActFour() {
   safehavenRoom.classList.add("hidden");
   frequencyPuzzle.classList.add("hidden");
   debtHud.classList.add("hidden");
+  finalRoom.classList.add("hidden");
 
   document.body.classList.remove("act-two");
   document.body.classList.remove("act-three");
@@ -776,6 +907,7 @@ async function runActFive() {
   smugglerRoom.classList.add("hidden");
   safehavenRoom.classList.add("hidden");
   frequencyPuzzle.classList.add("hidden");
+  finalRoom.classList.add("hidden");
   merchantRoom.classList.remove("hidden");
   debtHud.classList.remove("hidden");
 
@@ -818,6 +950,7 @@ async function runActSix() {
   smugglerRoom.classList.add("hidden");
   frequencyPuzzle.classList.add("hidden");
   debtHud.classList.add("hidden");
+  finalRoom.classList.add("hidden");
   safehavenRoom.classList.remove("hidden");
 
   document.body.classList.remove("act-two");
@@ -840,6 +973,41 @@ async function runActSix() {
   await smugglerSay("Arm all three switches, then route reserve energy to this sector.");
 
   addLine("[SMUGGLER]: Solve the three historical switch locks now.");
+}
+
+async function runActSeven() {
+  if (actSevenStarted) {
+    return;
+  }
+
+  actSevenStarted = true;
+  resetDialogue();
+  safehavenRoom.classList.add("hidden");
+  merchantRoom.classList.add("hidden");
+  smugglerRoom.classList.add("hidden");
+  frequencyPuzzle.classList.add("hidden");
+  debtHud.classList.add("hidden");
+  finalRoom.classList.remove("hidden");
+
+  document.body.classList.remove("act-two");
+  document.body.classList.remove("act-three");
+  document.body.classList.remove("act-four");
+  document.body.classList.remove("act-five");
+  document.body.classList.remove("act-six");
+  document.body.classList.remove("comms-hijack");
+  document.body.classList.add("act-seven");
+
+  noiseLayer.classList.add("hidden");
+  portrait.classList.remove("hard-glitch");
+  statusLabel.textContent = "[ FINAL ACT: TIME-BOMB REVIEW ]";
+  setFanLevel(0.01);
+
+  resetFinalActState();
+
+  await typeAddLine("[SYSTEM]: Historical payload branch detected: W32.Mydoom.A time-gated spread routine.");
+  await typeAddLine("[SYSTEM]: As containment holds, corrupted modules will self-heal and revert to baseline code.");
+  await typeAddLine("[ANONYMOUS]: This variant carries an internal drop-dead date. Identify the exact YYYYMMDD token and commit it.");
+  await typeAddLine("[ANONYMOUS]: Run forensic tools, confirm the date, then execute the final line of code.");
 }
 
 async function finishActThree() {
@@ -974,9 +1142,32 @@ switchBtn3.addEventListener("click", () => {
 });
 
 reservePowerBtn.addEventListener("click", activateReservePower);
+runDateAuditBtn.addEventListener("click", runDateAudit);
+readForensicsBtn.addEventListener("click", readForensics);
+sealDoomBtn.addEventListener("click", validateDoomKey);
+doomKey.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    validateDoomKey();
+  }
+});
+restartButton.addEventListener("click", () => {
+  window.location.reload();
+});
+logicButton.addEventListener("click", () => {
+  setLogicPanel(logicPanel.classList.contains("hidden"));
+});
+logicClose.addEventListener("click", () => {
+  setLogicPanel(false);
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !logicPanel.classList.contains("hidden")) {
+    setLogicPanel(false);
+  }
+});
 
 startButton.addEventListener("click", async () => {
   ensureAudio();
+  setLogicPanel(false);
 
   intro.classList.add("hidden");
   stage.classList.remove("hidden");
@@ -985,3 +1176,17 @@ startButton.addEventListener("click", async () => {
   await wait(1000);
   await runActTwo();
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
