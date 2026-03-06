@@ -22,6 +22,11 @@
           <figure class="portrait glitch" id="portrait" aria-label="Man in shadows">
             <div class="eyes"></div>
             <div class="mouth" id="mouth"></div>
+            <div class="skull-flash hidden" id="skullFlash" aria-live="assertive">
+              <p class="skull-icon">[::SKULL::]</p>
+              <p>YOU HAVE BEEN HACKED BY MYDOOM</p>
+              <p>YOU HAVE 40 MINUTES BEFORE THE SYSTEM SHUTS DOWN</p>
+            </div>
           </figure>
         </header>
 
@@ -213,6 +218,20 @@ UFO: ??</pre>
 
           <section class="safehaven-room hidden" id="safehavenRoom">
             <p class="challenge-title">SAFEHAVEN: RESERVE SWITCHBOARD</p>
+                        <div class="question-briefing">
+              <p class="briefing-title">Interactive Briefing Console</p>
+              <div class="briefing-tabs" id="briefingTabs">
+                <button type="button" class="briefing-tab active" data-briefing="1">Q1: Susan Thunder</button>
+                <button type="button" class="briefing-tab" data-briefing="2">Q2: ILOVEYOU Worm</button>
+                <button type="button" class="briefing-tab" data-briefing="3">Q3: FACE Backdoor</button>
+              </div>
+              <article class="briefing-panel">
+                <p class="briefing-heading" id="briefingHeading"></p>
+                <p class="briefing-story" id="briefingStory"></p>
+                <p class="briefing-question" id="briefingQuestion"></p>
+                <div class="briefing-options" id="briefingOptions"></div>
+              </article>
+            </div>
             <div class="safehaven-layout">
               <div class="smuggler-speaker">
                 <div class="smuggler-face" id="smugglerFace" aria-hidden="true">
@@ -307,6 +326,10 @@ UFO: ??</pre>
     <script src="./script.js"></script>
   </body>
 </html>
+
+
+
+
 
 
 

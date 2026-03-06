@@ -49,8 +49,59 @@ body.act-six {
   background: radial-gradient(circle at 50% 15%, #1a3f1a 0%, #08130b 64%);
 }
 
-body.act-seven {
-  background: radial-gradient(circle at 50% 15%, #082534 0%, #04090f 65%);
+
+body.startup-blackout {
+  background: #000;
+}
+
+body.startup-blackout .stage {
+  border-color: #ff2d2d;
+  background: rgba(0, 0, 0, 0.98);
+  box-shadow: 0 0 42px rgba(255, 45, 45, 0.35);
+}
+
+body.startup-blackout .scanlines {
+  opacity: 0.65;
+}
+
+.skull-flash {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 0.4rem;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.9);
+  color: #ff4a4a;
+  padding: 0.9rem;
+  z-index: 4;
+}
+
+.skull-icon {
+  margin: 0;
+  font-size: clamp(1.4rem, 4vw, 2.4rem);
+  letter-spacing: 0.08em;
+  color: #ffe1e1;
+}
+
+.skull-flash p {
+  margin: 0;
+  font-size: clamp(0.75rem, 2vw, 0.95rem);
+  line-height: 1.35;
+}
+
+.skull-flash.flashing {
+  animation: skull-flash 160ms steps(2, end) infinite;
+}
+
+@keyframes skull-flash {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 
 .screen {
@@ -845,6 +896,77 @@ canvas {
   color: #ffe9e2;
 }
 
+
+.question-briefing {
+  border: 1px solid rgba(125, 255, 136, 0.45);
+  background: rgba(5, 20, 8, 0.62);
+  padding: 0.8rem;
+}
+
+.briefing-title {
+  margin: 0 0 0.5rem;
+  color: #b9ffbe;
+  font-weight: 700;
+}
+
+.briefing-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.65rem;
+}
+
+.briefing-tab {
+  border-color: #4fd05d;
+  color: #b9ffbe;
+  padding: 0.45rem 0.7rem;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.briefing-tab:hover,
+.briefing-tab:focus-visible,
+.briefing-tab.active {
+  background: rgba(79, 208, 93, 0.24);
+  color: #e6ffe8;
+}
+
+.briefing-panel {
+  border: 1px solid rgba(125, 255, 136, 0.35);
+  background: rgba(4, 16, 6, 0.7);
+  padding: 0.7rem;
+}
+
+.briefing-heading {
+  margin: 0 0 0.45rem;
+  color: #d0ffd3;
+  font-weight: 700;
+}
+
+.briefing-story,
+.briefing-question {
+  margin: 0 0 0.5rem;
+  line-height: 1.42;
+}
+
+.briefing-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.briefing-option {
+  border-color: #7dff88;
+  color: #caffce;
+  padding: 0.4rem 0.65rem;
+}
+
+.briefing-option:hover,
+.briefing-option:focus-visible,
+.briefing-option.selected {
+  background: rgba(125, 255, 136, 0.28);
+  color: #f2fff3;
+}
 .safehaven-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1057,6 +1179,44 @@ canvas {
   .switch-grid {
     grid-template-columns: 1fr;
   }
+
+  .briefing-tabs,
+  .briefing-options {
+    flex-direction: column;
+  }
+}
+  .dial-wrap {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .dial-scale {
+    width: 100%;
+  }
+
+  .smuggler-quiz {
+    grid-template-columns: 1fr;
+  }
+
+  .item-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .merchant-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .merchant-portrait {
+    width: 100%;
+  }
+
+  .fallacy-options {
+    grid-template-columns: 1fr;
+  }
+
+  .switch-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 700px) {
@@ -1171,5 +1331,10 @@ body.act-seven input {
   color: #b8e8ff;
   font-style: italic;
 }
+
+
+
+
+
 
 

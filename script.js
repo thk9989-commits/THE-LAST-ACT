@@ -4,6 +4,7 @@ const stage = document.getElementById("stage");
 const dialogue = document.getElementById("dialogue");
 const statusLabel = document.getElementById("status");
 const mouth = document.getElementById("mouth");
+const skullFlash = document.getElementById("skullFlash");
 const portrait = document.getElementById("portrait");
 const challenge = document.getElementById("challenge");
 const decryptKey = document.getElementById("decryptKey");
@@ -59,6 +60,11 @@ const switchProgress = document.getElementById("switchProgress");
 const safehavenFeedback = document.getElementById("safehavenFeedback");
 const threatWave = document.getElementById("threatWave");
 const reservePowerBtn = document.getElementById("reservePowerBtn");
+const briefingHeading = document.getElementById("briefingHeading");
+const briefingStory = document.getElementById("briefingStory");
+const briefingQuestion = document.getElementById("briefingQuestion");
+const briefingOptions = document.getElementById("briefingOptions");
+const briefingTabs = Array.from(document.querySelectorAll(".briefing-tab"));
 const finalRoom = document.getElementById("finalRoom");
 const finalSnippet = document.getElementById("finalSnippet");
 const finalConsole = document.getElementById("finalConsole");
@@ -132,12 +138,53 @@ const ravenClaims = [
   }
 ];
 
-const concedeLines = ["Hmmm....I concede", "Darn", "You're right", "Fine. Fair point.", "Alright. I surrender."];
-
 const safeSwitchAnswers = {
   1: "11",
   2: "125000",
   3: "15101214"
+};
+
+
+const safehavenBriefings = {
+  1: {
+    title: "Q1 - The Ghost of the 80s: Susan Headley (Susan Thunder)",
+    story:
+      "Susan Thunder was part of the Roscoe Gang and specialized in social engineering. Her psychological targeting pattern follows an arithmetic progression.",
+    question:
+      "Targets are 02, 05, 08 with +3 progression. What is the 4th 2-digit code for the overwhelmed intern?",
+    targetSwitch: 1,
+    choices: [
+      { label: "11", value: "11", correct: true },
+      { label: "10", value: "10", correct: false },
+      { label: "12", value: "12", correct: false }
+    ]
+  },
+  2: {
+    title: "Q2 - Virus Pioneer: ILOVEYOU Worm",
+    story:
+      "The worm replicated by sending itself to every contact. Generation growth here is modeled as 50 multiplied each round.",
+    question:
+      "Generation 3 infections in this model are computed by 50 x 50 x 50. Which value matches?",
+    targetSwitch: 2,
+    choices: [
+      { label: "125000", value: "125000", correct: true },
+      { label: "25000", value: "25000", correct: false },
+      { label: "100000", value: "100000", correct: false }
+    ]
+  },
+  3: {
+    title: "Q3 - Phineas Fisher: FACE Backdoor",
+    story:
+      "Hexadecimal mapping applies: A=10, C=12, E=14 and F=15. Pair each value in FACE to form one 8-digit gate string.",
+    question:
+      "Translate F-A-C-E into paired numeric form using hex logic. Which 8-digit string is correct?",
+    targetSwitch: 3,
+    choices: [
+      { label: "15101214", value: "15101214", correct: true },
+      { label: "15011214", value: "15011214", correct: false },
+      { label: "15101412", value: "15101412", correct: false }
+    ]
+  }
 };
 
 const MYDOOM_SPREAD_END = "20040212";
@@ -184,7 +231,7 @@ function addLine(text, cssClass = "") {
   dialogue.scrollTop = dialogue.scrollHeight;
 }
 
-function typeLine(text, target) {
+function typeLine(text, target, speedMs = 30) {
   return new Promise((resolve) => {
     let i = 0;
     mouth.classList.add("talking");
@@ -199,17 +246,17 @@ function typeLine(text, target) {
         mouth.classList.remove("talking");
         resolve();
       }
-    }, 30);
+    }, speedMs);
   });
 }
 
-async function typeAddLine(text, cssClass = "") {
+async function typeAddLine(text, cssClass = "", speedMs = 30) {
   const p = document.createElement("p");
   if (cssClass) {
     p.className = cssClass;
   }
   dialogue.appendChild(p);
-  await typeLine(text, p);
+  await typeLine(text, p, speedMs);
 }
 
 async function smugglerSay(text) {
@@ -575,6 +622,46 @@ function resetSafehavenState() {
   switchProgress.textContent = "Switches armed: 0 / 3";
 }
 
+function renderBriefing(questionId) {
+  const briefing = safehavenBriefings[questionId];
+  if (!briefing) {
+    return;
+  }
+
+  briefingTabs.forEach((tab) => {
+    tab.classList.toggle("active", tab.dataset.briefing === String(questionId));
+  });
+
+  briefingHeading.textContent = briefing.title;
+  briefingStory.textContent = briefing.story;
+  briefingQuestion.textContent = briefing.question;
+
+  briefingOptions.innerHTML = "";
+
+  briefing.choices.forEach((choice) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "briefing-option";
+    button.textContent = choice.label;
+
+    button.addEventListener("click", () => {
+      const targetInput = briefing.targetSwitch === 1 ? switchInput1 : briefing.targetSwitch === 2 ? switchInput2 : switchInput3;
+      targetInput.value = choice.value;
+      targetInput.focus();
+
+      safehavenFeedback.classList.toggle("warning", !choice.correct);
+      safehavenFeedback.textContent = choice.correct
+        ? `Q${questionId} choice loaded to Switch 0${briefing.targetSwitch}. Press Flip Switch.`
+        : `Q${questionId} choice loaded, but verify your logic before flipping.`;
+
+      const optionButtons = Array.from(briefingOptions.querySelectorAll(".briefing-option"));
+      optionButtons.forEach((opt) => opt.classList.remove("selected"));
+      button.classList.add("selected");
+    });
+
+    briefingOptions.appendChild(button);
+  });
+}
 function updateSwitchProgress() {
   switchProgress.textContent = `Switches armed: ${armedSwitches.size} / 3`;
 
@@ -737,7 +824,59 @@ function scrambleText(durationMs = 3000) {
 }
 
 async function runSceneOne() {
-  statusLabel.textContent = "[ CONNECTION ESTABLISHED ]";
+  statusLabel.classList.remove("warning");
+  statusLabel.textContent = "[ SYSTEM STARTUP: PRE-FLIGHT CHECK ]";
+
+  const startupChecks = [
+    "[BOOT]: Kernel handoff complete.",
+    "[BOOT]: Memory integrity check ...... PASS",
+    "[BOOT]: File-system checksum ......... PASS",
+    "[BOOT]: Network route diagnostics ..... PASS",
+    "[BOOT]: Runtime signature table ....... PASS"
+  ];
+
+  for (let idx = 0; idx < startupChecks.length; idx += 1) {
+    await typeAddLine(startupChecks[idx]);
+    await wait(420);
+  }
+
+  await wait(420);
+  statusLabel.classList.add("warning");
+  statusLabel.textContent = "[ CRITICAL ERROR: UNKNOWN EXECUTION BUG ]";
+  await typeAddLine("[SYSTEM]: Unexpected payload spawned inside trusted runtime.", "warning");
+  await typeAddLine("[SYSTEM]: Error storm escalating. Core stability lost.", "warning");
+
+  const bugBursts = [
+    "ERROR 0x7F2A: stack overflow in startup routine",
+    "ERROR 0x91D0: unauthorized mutation detected",
+    "ERROR 0xA113: watchdog process terminated",
+    "ERROR 0xB66E: thermal control logic corrupted"
+  ];
+
+  for (let idx = 0; idx < bugBursts.length; idx += 1) {
+    addLine(bugBursts[idx], "warning");
+    await wait(150);
+  }
+
+  document.body.classList.add("startup-blackout");
+  portrait.classList.add("hard-glitch");
+  noiseLayer.classList.remove("hidden");
+  skullFlash.classList.remove("hidden");
+  skullFlash.classList.add("flashing");
+  setFanLevel(0.075);
+
+  await wait(3600);
+
+  skullFlash.classList.remove("flashing");
+  skullFlash.classList.add("hidden");
+  document.body.classList.remove("startup-blackout");
+  portrait.classList.remove("hard-glitch");
+  noiseLayer.classList.add("hidden");
+  setFanLevel(0.03);
+
+  resetDialogue();
+  statusLabel.classList.remove("warning");
+  statusLabel.textContent = "[ CONNECTION RE-ESTABLISHED ]";
 
   for (let idx = 0; idx < sceneOneLines.length; idx += 1) {
     await typeAddLine(sceneOneLines[idx]);
@@ -928,9 +1067,9 @@ async function runActFive() {
   currentClaimIndex = 0;
   updateDebtHud();
 
-  await typeAddLine("[ANONYMOUS]: This trader controls a USB route that jumps straight to the final level.");
-  await typeAddLine("[TRADER]: I would hand it over free. This server is one of my favorite markets.");
-  await typeAddLine("[TRADER]: But first, I want $500,000 for it. Break my argument if you can.");
+  await typeAddLine("[ANONYMOUS]: This trader controls a USB route that jumps straight to the final level.", "", 48);
+  await typeAddLine("[TRADER]: I would hand it over free. This server is one of my favorite markets.", "", 50);
+  await typeAddLine("[TRADER]: But first, I want $500,000 for it. Break my argument if you can.", "", 52);
 
   merchantLine.textContent = "The trader insists the USB is not just an item, but still tries to charge for status and fear.";
   merchantFeedback.textContent = "";
@@ -966,6 +1105,7 @@ async function runActSix() {
   setFanLevel(0.03);
 
   resetSafehavenState();
+  renderBriefing(1);
 
   await smugglerSay("We are being transported to a safehaven for brief rest.");
   await smugglerSay("Power is cut from the mother system. CPU, RAM, and storage protection are failing.");
@@ -1141,6 +1281,12 @@ switchBtn3.addEventListener("click", () => {
   registerSwitchResult(3, switchInput3, switchState3, switchCard3, switchBtn3);
 });
 
+briefingTabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    renderBriefing(Number(tab.dataset.briefing));
+  });
+});
+
 reservePowerBtn.addEventListener("click", activateReservePower);
 runDateAuditBtn.addEventListener("click", runDateAudit);
 readForensicsBtn.addEventListener("click", readForensics);
@@ -1176,6 +1322,17 @@ startButton.addEventListener("click", async () => {
   await wait(1000);
   await runActTwo();
 });
+
+
+
+
+
+
+
+
+
+
+
 
 
 
