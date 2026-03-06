@@ -40,7 +40,7 @@
             <p class="hud-hits" id="ravenHits">Raven Hits: 0 / 5</p>
           </aside>
 
-          <div class="logic-toolbar">
+          <div class="logic-toolbar" id="logicToolbar">
             <button id="logicButton" type="button" aria-expanded="false" aria-controls="logicPanel">Explain Puzzle Logic</button>
           </div>
 
@@ -284,40 +284,64 @@ UFO: ??</pre>
             <button id="reservePowerBtn" type="button" disabled>Route Reserve Power</button>
             <p class="challenge-feedback" id="safehavenFeedback"></p>
           </section>
-
           <section class="final-room hidden" id="finalRoom">
-            <p class="challenge-title">FINAL ACT: THE FINAL LINE OF CODE</p>
-            <p class="room-text">
-              The History: The Time-Bomb Betrayal. W32.Mydoom.A was released in January 2004 to launch DDoS pressure against SCO Group and Microsoft.
-            </p>
-            <p class="room-text">
-              Its spreading routine was hard-coded with a drop-dead condition. After cutoff, MyDoom faded and each infected branch slowly recompiled back to normal execution.
-            </p>
-            <pre class="final-snippet" id="finalSnippet">if (systemDate &gt; "YYYYMMDD") { return; }</pre>
+            <p class="challenge-title" id="finalActTitle">FINAL ACT: MYDOOM PROPOSITION</p>
 
-            <div class="final-tools">
-              <button id="runDateAudit" type="button">Run Date Audit</button>
-              <button id="readForensics" type="button">Read Forensics</button>
-            </div>
+            <section class="boss-choice-panel" id="bossChoicePanel">
+              <p class="room-text">MYDOOM presents a pre-combat ethical branch.</p>
+              <p class="room-text">
+                Utilitarian branch: resist and attempt containment. Failure risks cascading deletion across this server, adjacent systems, and connected worlds.
+              </p>
+              <p class="room-text">Egoism branch: join MYDOOM. Server 01 is preserved while surrounding servers are consumed.</p>
+              <div class="boss-choice-row">
+                <button id="chooseUtilitarian" type="button">Choose Utilitarian</button>
+                <button id="chooseEgoism" type="button">Choose Egoism</button>
+              </div>
+              <p class="challenge-feedback" id="bossChoiceFeedback"></p>
+            </section>
 
-            <article class="final-console" id="finalConsole">Awaiting final command.</article>
+            <section class="final-fight-panel hidden" id="finalFightPanel">
+              <p class="room-text">
+                The utilitarian branch keeps the fight active. You proceed to the containment key sequence.
+              </p>
+              <p class="room-text">
+                The History: The Time-Bomb Betrayal. W32.Mydoom.A was released in January 2004 to launch DDoS pressure against SCO Group and Microsoft.
+              </p>
+              <p class="room-text">
+                Its spreading routine was hard-coded with a drop-dead condition. After cutoff, MyDoom faded and each infected branch slowly recompiled back to normal execution.
+              </p>
+              <pre class="final-snippet" id="finalSnippet">if (systemDate &gt; "YYYYMMDD") { return; }</pre>
 
-            <p class="challenge-text">
-              Question: supply the 8-digit date string (YYYYMMDD) used as the official end of MyDoom.A's mass-mailing phase.
-            </p>
-            <div class="challenge-row">
-              <input id="doomKey" type="text" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="YYYYMMDD" />
-              <button id="sealDoomBtn" type="button">Execute Final Line</button>
-            </div>
-            <p class="challenge-feedback" id="doomFeedback"></p>
+              <div class="final-tools">
+                <button id="runDateAudit" type="button">Run Date Audit</button>
+                <button id="readForensics" type="button">Read Forensics</button>
+              </div>
 
-            <p class="room-text final-riddle">
-              I am the silence after the storm, a built-in end to a digital form. I was not stopped by a wall or a shield, but by a date I was forced to yield.
-            </p>
-            <p class="room-text" id="finalLine">Awaiting final transmission. Restoration sequence pending...</p>
+              <article class="final-console" id="finalConsole">Awaiting final command.</article>
+
+              <p class="challenge-text">
+                Question: supply the 8-digit date string (YYYYMMDD) used as the official end of MyDoom.A's mass-mailing phase.
+              </p>
+              <div class="challenge-row">
+                <input id="doomKey" type="text" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="YYYYMMDD" />
+                <button id="sealDoomBtn" type="button">Execute Final Line</button>
+              </div>
+              <p class="challenge-feedback" id="doomFeedback"></p>
+
+              <p class="room-text final-riddle">
+                I am the silence after the storm, a built-in end to a digital form. I was not stopped by a wall or a shield, but by a date I was forced to yield.
+              </p>
+              <p class="room-text" id="finalLine">Awaiting final transmission. Restoration sequence pending...</p>
+            </section>
+
+            <section class="egoism-cutscene hidden" id="egoismCutscene">
+              <p class="room-text">Egoism branch selected. This server is spared while adjacent systems are targeted.</p>
+              <pre class="final-console egoism-stream" id="egoismConsole">Awaiting branch execution...</pre>
+              <p class="room-text" id="egoismSummary"></p>
+            </section>
+
             <button id="restartButton" type="button">Run Again</button>
           </section>
-
           <p class="prompt" id="prompt">_</p>
         </div>
       </section>
@@ -326,6 +350,7 @@ UFO: ??</pre>
     <script src="./script.js"></script>
   </body>
 </html>
+
 
 
 

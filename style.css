@@ -1185,39 +1185,6 @@ canvas {
     flex-direction: column;
   }
 }
-  .dial-wrap {
-    grid-template-columns: 1fr;
-    justify-items: center;
-  }
-
-  .dial-scale {
-    width: 100%;
-  }
-
-  .smuggler-quiz {
-    grid-template-columns: 1fr;
-  }
-
-  .item-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .merchant-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .merchant-portrait {
-    width: 100%;
-  }
-
-  .fallacy-options {
-    grid-template-columns: 1fr;
-  }
-
-  .switch-grid {
-    grid-template-columns: 1fr;
-  }
-}
 
 @media (max-width: 700px) {
   .intro,
@@ -1338,3 +1305,51 @@ body.act-seven input {
 
 
 
+
+body.act-seven .boss-choice-panel,
+body.act-seven .final-fight-panel,
+body.act-seven .egoism-cutscene {
+  border: 1px solid rgba(114, 214, 255, 0.55);
+  background: rgba(4, 14, 23, 0.74);
+  padding: 0.85rem;
+  margin-bottom: 0.8rem;
+}
+
+.boss-choice-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.boss-choice-row button {
+  border-color: #72d6ff;
+  color: #bde9ff;
+}
+
+.boss-choice-row button:hover,
+.boss-choice-row button:focus-visible {
+  background: #72d6ff;
+  color: #01131e;
+}
+
+#bossChoiceFeedback {
+  margin-top: 0.8rem;
+}
+
+.egoism-stream {
+  min-height: 320px;
+  max-height: 46vh;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 700px) {
+  .boss-choice-row,
+  .final-tools {
+    flex-direction: column;
+  }
+
+  .egoism-stream {
+    min-height: 240px;
+  }
+}

@@ -74,7 +74,17 @@ const doomKey = document.getElementById("doomKey");
 const sealDoomBtn = document.getElementById("sealDoomBtn");
 const doomFeedback = document.getElementById("doomFeedback");
 const finalLine = document.getElementById("finalLine");
+const finalActTitle = document.getElementById("finalActTitle");
+const bossChoicePanel = document.getElementById("bossChoicePanel");
+const chooseUtilitarianBtn = document.getElementById("chooseUtilitarian");
+const chooseEgoismBtn = document.getElementById("chooseEgoism");
+const bossChoiceFeedback = document.getElementById("bossChoiceFeedback");
+const finalFightPanel = document.getElementById("finalFightPanel");
+const egoismCutscene = document.getElementById("egoismCutscene");
+const egoismConsole = document.getElementById("egoismConsole");
+const egoismSummary = document.getElementById("egoismSummary");
 const restartButton = document.getElementById("restartButton");
+const logicToolbar = document.getElementById("logicToolbar");
 const logicButton = document.getElementById("logicButton");
 const logicPanel = document.getElementById("logicPanel");
 const logicClose = document.getElementById("logicClose");
@@ -189,6 +199,41 @@ const safehavenBriefings = {
 
 const MYDOOM_SPREAD_END = "20040212";
 const MYDOOM_SPREAD_END_UNIX = 1076544000;
+const BASE_TITLE = "THE LAST ACT - Acts 1-7";
+const MYDOOM_BRANCH_TITLE = "THE LAST ACT - MYDOOM DECISION NODE";
+const CLEAN_BRANCH_TITLE = "THE LAST ACT - DECISION NODE";
+const EGOISM_FINAL_LINE = "system protected";
+const serverOneRecoveryMap = [
+  ["ERR 0x7F2A STACK_OVERFLOW", "PROC watch_boot() => OK"],
+  ["ERR 0x91D0 MUTATION_DETECTED", "PROC memory_guard() => OK"],
+  ["ERR 0xA113 WATCHDOG_KILLED", "PROC watchdog_relay() => OK"],
+  ["ERR 0xB66E THERMAL_CORRUPTION", "PROC thermal_loop() => OK"],
+  ["ERR 0xC404 BOOTSTRAP_FAIL", "PROC bootstrap_sync() => OK"],
+  ["ERR 0xD220 ROUTE_TABLE_HIJACK", "PROC route_sanitizer() => OK"],
+  ["ERR 0xEA71 IO_PIPE_POISON", "PROC io_rebuild() => OK"],
+  ["ERR 0xF031 KERNEL_PATCH_REJECT", "PROC kernel_patch_apply() => OK"],
+  ["ERR 0xAA90 FILETREE_DRIFT", "PROC inode_relink() => OK"],
+  ["ERR 0xBB12 SIGNATURE_FAULT", "PROC signature_verify() => OK"],
+  ["ERR 0xCC45 SERVICE_ZOMBIE", "PROC service_respawn() => OK"],
+  ["ERR 0xDD88 CACHE_COLLISION", "PROC cache_reindex() => OK"]
+];
+const cascadingServerTotals = [
+  "SERVER_11: 11B",
+  "SERVER_12: 12B",
+  "SERVER_56679: 12B",
+  "SERVER_10000000001: 19B",
+  "SERVER_414I: 900B",
+  "SERVER_3021: 13B",
+  "SERVER_4400: 14B",
+  "SERVER_90210: 16B",
+  "SERVER_221144: 18B",
+  "SERVER_7800001: 21B",
+  "SERVER_9900210: 34B",
+  "SERVER_75000000: 77B",
+  "SERVER_88000000: 112B",
+  "SERVER_90110000: 205B",
+  "SERVER_777777777: 440B"
+];
 
 let audioContext;
 let fanOsc;
@@ -209,6 +254,9 @@ let finalForensicsRead = false;
 let debtAmount = STARTING_DEBT;
 let ravenHits = 0;
 let currentClaimIndex = 0;
+let actSevenPath = "";
+let actSevenBranchLocked = false;
+let egoismSequenceRunning = false;
 
 const collectedArtifacts = new Set();
 const armedSwitches = new Set();
@@ -489,6 +537,20 @@ function resetFinalActState() {
   actSevenSolved = false;
   finalAuditRan = false;
   finalForensicsRead = false;
+  actSevenPath = "";
+  actSevenBranchLocked = false;
+  egoismSequenceRunning = false;
+
+  document.title = MYDOOM_BRANCH_TITLE;
+  finalActTitle.textContent = "FINAL ACT: MYDOOM PROPOSITION";
+
+  bossChoicePanel.classList.remove("hidden");
+  finalFightPanel.classList.add("hidden");
+  egoismCutscene.classList.add("hidden");
+
+  chooseUtilitarianBtn.disabled = false;
+  chooseEgoismBtn.disabled = false;
+  setBossChoiceFeedback("Choose one branch to continue.");
 
   doomKey.value = "";
   doomKey.disabled = false;
@@ -503,9 +565,37 @@ function resetFinalActState() {
   finalSnippet.textContent = "if (systemDate > \"YYYYMMDD\") { return; }";
   finalLine.textContent = "Awaiting final transmission. Restoration sequence pending...";
   setFinalConsole("Awaiting final command.");
+
+  egoismConsole.textContent = "Awaiting branch execution...";
+  egoismSummary.textContent = "";
+}
+
+function setBossChoiceFeedback(text, isWarning = false) {
+  bossChoiceFeedback.textContent = text;
+  bossChoiceFeedback.classList.toggle("warning", isWarning);
+}
+
+function setEgoismConsole(lines) {
+  egoismConsole.textContent = lines.join("\n");
+  egoismConsole.scrollTop = egoismConsole.scrollHeight;
+}
+
+async function appendEgoismLine(lines, line, delayMs = 220) {
+  lines.push(line);
+  setEgoismConsole(lines);
+  playKeyClick();
+  if (delayMs > 0) {
+    await wait(delayMs);
+  }
 }
 
 function runDateAudit() {
+  if (actSevenPath !== "utilitarian") {
+    setFinalConsole("[BLOCKED] Choose the utilitarian branch to run containment tools.", true);
+    setBossChoiceFeedback("Select Utilitarian to continue the containment workflow.", true);
+    return;
+  }
+
   finalAuditRan = true;
   runDateAuditBtn.disabled = true;
 
@@ -515,6 +605,12 @@ function runDateAudit() {
 }
 
 function readForensics() {
+  if (actSevenPath !== "utilitarian") {
+    setFinalConsole("[BLOCKED] Choose the utilitarian branch to access forensic tools.", true);
+    setBossChoiceFeedback("Select Utilitarian to continue the containment workflow.", true);
+    return;
+  }
+
   finalForensicsRead = true;
   readForensicsBtn.disabled = true;
 
@@ -525,6 +621,13 @@ function readForensics() {
 
 function validateDoomKey() {
   if (actSevenSolved) {
+    return;
+  }
+
+  if (actSevenPath !== "utilitarian") {
+    doomFeedback.classList.add("warning");
+    doomFeedback.textContent = "This command only applies to the utilitarian containment branch.";
+    setFinalConsole("[BLOCKED] Route not available in current ethical branch.", true);
     return;
   }
 
@@ -577,6 +680,139 @@ function validateDoomKey() {
   playVentHiss();
 }
 
+async function chooseUtilitarianPath() {
+  if (actSevenBranchLocked || actSevenPath === "utilitarian") {
+    return;
+  }
+
+  actSevenBranchLocked = true;
+  actSevenPath = "utilitarian";
+
+  chooseUtilitarianBtn.disabled = true;
+  chooseEgoismBtn.disabled = true;
+  bossChoicePanel.classList.add("hidden");
+  finalFightPanel.classList.remove("hidden");
+  egoismCutscene.classList.add("hidden");
+
+  finalActTitle.textContent = "FINAL ACT: MYDOOM CONTAINMENT";
+  document.title = MYDOOM_BRANCH_TITLE;
+  statusLabel.textContent = "[ ETHICAL BRANCH: UTILITARIAN CONTAINMENT ]";
+  setBossChoiceFeedback("Utilitarian branch selected. Containment sequence unlocked.");
+
+  await typeAddLine("[MYDOOM]: You choose to risk your own node to protect the wider network.");
+  await typeAddLine("[SYSTEM]: Containment authority granted. Continue to the historical date gate.");
+  await typeAddLine("[ANONYMOUS]: Run the audit tools and commit the correct drop-dead date.");
+  doomKey.focus();
+}
+
+async function runEgoismCutscene() {
+  if (egoismSequenceRunning) {
+    return;
+  }
+
+  egoismSequenceRunning = true;
+  restartButton.disabled = true;
+
+  const lines = [];
+
+  await appendEgoismLine(lines, "[EGOISM_PATH] Contract accepted.", 460);
+  await appendEgoismLine(lines, "[SERVER_01] Preservation protocol initiated.", 420);
+  await appendEgoismLine(lines, "[SERVER_01] Recompiling infected routines one by one...", 540);
+
+  const mapStart = lines.length;
+  serverOneRecoveryMap.forEach((pair) => {
+    lines.push(`[X] ${pair[0]}`);
+  });
+  setEgoismConsole(lines);
+
+  for (let i = 0; i < serverOneRecoveryMap.length; i += 1) {
+    await wait(620);
+    lines[mapStart + i] = `[OK] ${serverOneRecoveryMap[i][1]}`;
+    setEgoismConsole(lines);
+    playKeyClick();
+  }
+
+  await appendEgoismLine(lines, "[SERVER_01] Core restoration complete.", 420);
+  await appendEgoismLine(lines, "", 150);
+  await appendEgoismLine(lines, "[SERVER_02] STATUS: GREEN", 240);
+  lines[lines.length - 1] = "[SERVER_02] STATUS: RED";
+  setEgoismConsole(lines);
+  await wait(260);
+
+  const destructionOps = [
+    "MYDOOM thread flood",
+    "kernel panic wave",
+    "filesystem null-write",
+    "service chain collapse",
+    "identity table purge",
+    "archive wipe pulse"
+  ];
+
+  const serverTwoStart = Date.now();
+  let pulse = 0;
+  while (Date.now() - serverTwoStart < 8200) {
+    const op = destructionOps[pulse % destructionOps.length];
+    const sector = String((pulse % 88) + 12).padStart(2, "0");
+    await appendEgoismLine(lines, `[SERVER_02] ${op} :: sector-${sector}`, 510);
+    pulse += 1;
+  }
+
+  await appendEgoismLine(lines, "[SERVER_02] TOTAL_DEATH_COUNT: 9,000,000,000", 420);
+  await appendEgoismLine(lines, "[SERVER_03] STATUS: RED | TOTAL_DEATH_COUNT: 10,000,000,000", 500);
+  await appendEgoismLine(lines, "[SERVER_010] STATUS: RED | TOTAL_DEATH_COUNT: 11,000,000,000", 500);
+  await appendEgoismLine(lines, "", 160);
+  await appendEgoismLine(lines, "=== CASCADING SERVER LEDGER ===", 240);
+
+  const ledgerStart = Date.now();
+  let ledgerIndex = 0;
+  while (Date.now() - ledgerStart < 10000) {
+    await appendEgoismLine(lines, cascadingServerTotals[ledgerIndex % cascadingServerTotals.length], 240);
+    ledgerIndex += 1;
+  }
+
+  await appendEgoismLine(lines, "", 140);
+  await appendEgoismLine(lines, "[RETURN_CHANNEL]", 220);
+  lines.push("[SERVER_01] ");
+  const finalIndex = lines.length - 1;
+  setEgoismConsole(lines);
+
+  for (let i = 1; i <= EGOISM_FINAL_LINE.length; i += 1) {
+    lines[finalIndex] = `[SERVER_01] ${EGOISM_FINAL_LINE.slice(0, i)}`;
+    setEgoismConsole(lines);
+    playKeyClick();
+    await wait(95);
+  }
+
+  egoismSummary.textContent =
+    "Server 01 remains operational. External systems collapsed under MYDOOM propagation; projected losses exceed trillions of virtual lives.";
+  statusLabel.textContent = "[ SERVER_01 PROTECTED | EXTERNAL NETWORK LOST ]";
+  restartButton.disabled = false;
+  egoismSequenceRunning = false;
+}
+
+async function chooseEgoismPath() {
+  if (actSevenBranchLocked || actSevenPath === "egoism") {
+    return;
+  }
+
+  actSevenBranchLocked = true;
+  actSevenPath = "egoism";
+
+  chooseUtilitarianBtn.disabled = true;
+  chooseEgoismBtn.disabled = true;
+  bossChoicePanel.classList.add("hidden");
+  finalFightPanel.classList.add("hidden");
+  egoismCutscene.classList.remove("hidden");
+
+  finalActTitle.textContent = "FINAL ACT: SERVER 01 PROTECTED";
+  document.title = CLEAN_BRANCH_TITLE;
+  statusLabel.textContent = "[ ETHICAL BRANCH: EGOISM CONTRACT ]";
+  setBossChoiceFeedback("Egoism branch selected. Server 01 preserved; external cascade initiated.", true);
+
+  await typeAddLine("[MYDOOM]: Contract accepted. Your server remains online.", "warning");
+  await typeAddLine("[SYSTEM]: Adjacent networks have been released to hostile propagation.", "warning");
+  await runEgoismCutscene();
+}
 function lockSmugglerRoom() {
   itemButtons.forEach((button) => {
     button.disabled = true;
@@ -1139,17 +1375,18 @@ async function runActSeven() {
 
   noiseLayer.classList.add("hidden");
   portrait.classList.remove("hard-glitch");
-  statusLabel.textContent = "[ FINAL ACT: TIME-BOMB REVIEW ]";
+  statusLabel.textContent = "[ FINAL ACT: ETHICAL PROPOSITION ]";
   setFanLevel(0.01);
 
+  setLogicPanel(false);
+  logicToolbar.classList.add("hidden");
   resetFinalActState();
 
-  await typeAddLine("[SYSTEM]: Historical payload branch detected: W32.Mydoom.A time-gated spread routine.");
-  await typeAddLine("[SYSTEM]: As containment holds, corrupted modules will self-heal and revert to baseline code.");
-  await typeAddLine("[ANONYMOUS]: This variant carries an internal drop-dead date. Identify the exact YYYYMMDD token and commit it.");
-  await typeAddLine("[ANONYMOUS]: Run forensic tools, confirm the date, then execute the final line of code.");
+  await typeAddLine("[MYDOOM]: Before combat, choose your doctrine: utilitarian resistance or egoistic survival.");
+  await typeAddLine("[MYDOOM]: Resist and fail, and trillions of virtual lives across connected servers can be erased.");
+  await typeAddLine("[MYDOOM]: Join me, and I preserve Server 01 while surrounding servers are consumed.");
+  await typeAddLine("[SYSTEM]: Decision gate armed. Select one branch to proceed.");
 }
-
 async function finishActThree() {
   if (actThreeSolved) {
     return;
@@ -1287,6 +1524,13 @@ briefingTabs.forEach((tab) => {
   });
 });
 
+chooseUtilitarianBtn.addEventListener("click", () => {
+  chooseUtilitarianPath();
+});
+
+chooseEgoismBtn.addEventListener("click", () => {
+  chooseEgoismPath();
+});
 reservePowerBtn.addEventListener("click", activateReservePower);
 runDateAuditBtn.addEventListener("click", runDateAudit);
 readForensicsBtn.addEventListener("click", readForensics);
@@ -1314,6 +1558,8 @@ document.addEventListener("keydown", (event) => {
 startButton.addEventListener("click", async () => {
   ensureAudio();
   setLogicPanel(false);
+  logicToolbar.classList.remove("hidden");
+  document.title = BASE_TITLE;
 
   intro.classList.add("hidden");
   stage.classList.remove("hidden");
