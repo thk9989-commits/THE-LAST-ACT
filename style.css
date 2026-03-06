@@ -1451,3 +1451,26 @@ body.act-threshold .portrait {
     grid-template-columns: 1fr;
   }
 }
+
+.skip-act-btn {
+  margin-top: 0.65rem;
+  border-color: #d6ff72;
+  color: #e7ffab;
+}
+
+.skip-act-btn:hover,
+.skip-act-btn:focus-visible {
+  background: #d6ff72;
+  color: #1a2400;
+}
+
+body.act-five .skip-act-btn {
+  border-color: #ffcc80;
+  color: #ffe7bd;
+}
+
+body.act-five .skip-act-btn:hover,
+body.act-five .skip-act-btn:focus-visible {
+  background: #ffcc80;
+  color: #2a1403;
+}

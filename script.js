@@ -19,6 +19,12 @@ const thresholdInputRow = document.getElementById("thresholdInputRow");
 const thresholdKey = document.getElementById("thresholdKey");
 const thresholdSubmitBtn = document.getElementById("thresholdSubmit");
 const thresholdFeedback = document.getElementById("thresholdFeedback");
+const skipThresholdBtn = document.getElementById("skipThreshold");
+const skipAct2Btn = document.getElementById("skipAct2");
+const skipAct3Btn = document.getElementById("skipAct3");
+const skipAct4Btn = document.getElementById("skipAct4");
+const skipAct5Btn = document.getElementById("skipAct5");
+const skipAct6Btn = document.getElementById("skipAct6");
 
 const debtHud = document.getElementById("debtHud");
 const debtAmountLabel = document.getElementById("debtAmount");
@@ -668,6 +674,121 @@ function submitThresholdKey() {
   thresholdFeedback.classList.remove("warning");
   thresholdFeedback.textContent = "[ACCESS GRANTED] Key accepted.";
   resolveThresholdIfReady();
+}
+
+function skipThresholdToActTwo() {
+  if (thresholdSolved) {
+    resolveThresholdIfReady();
+    return;
+  }
+
+  thresholdSolved = true;
+  thresholdFeedback.classList.remove("warning");
+  thresholdFeedback.textContent = "[SKIP] Threshold bypass accepted.";
+  resolveThresholdIfReady();
+}
+
+function skipActTwo() {
+  if (actTwoSolved) {
+    return;
+  }
+
+  actTwoSolved = true;
+  decryptKey.value = "9503";
+  decryptKey.disabled = true;
+  submitKey.disabled = true;
+  challengeFeedback.classList.remove("warning");
+  challengeFeedback.textContent = "[SKIP] Act 2 bypassed.";
+  finishActTwo();
+}
+
+function skipActThree() {
+  if (!actThreeStarted || actThreeSolved) {
+    return;
+  }
+
+  frequencyDial.value = String(TARGET_CLUE_FREQUENCY);
+  updateFrequencyUI();
+  finishActThree();
+}
+
+function skipActFour() {
+  if (!actFourStarted || actFourSolved) {
+    return;
+  }
+
+  itemButtons.forEach((button) => {
+    if (button.dataset.item) {
+      collectedArtifacts.add(button.dataset.item);
+      button.classList.add("collected");
+    }
+  });
+  updateInventory();
+
+  actFourSolved = true;
+  smugglerFeedback.classList.remove("warning");
+  smugglerFeedback.textContent = "[SKIP] Smuggler key bypass accepted.";
+  finishActFour();
+}
+
+async function skipActFive() {
+  if (!actFiveStarted || actFiveSolved) {
+    return;
+  }
+
+  actFiveSolved = true;
+  debtAmount = 0;
+  ravenHits = ravenClaims.length;
+  currentClaimIndex = ravenClaims.length;
+  updateDebtHud();
+  setFallacyControls(true);
+
+  statusLabel.textContent = "[ TRADER BYPASSED ]";
+  merchantLine.textContent = "Bypass accepted. USB route injected.";
+  fallacyRound.textContent = "Raven sequence bypassed";
+  fallacyClaim.textContent = "Argument branch skipped.";
+  merchantFeedback.classList.remove("warning");
+  merchantFeedback.textContent = "[SKIP] Trader room bypass complete.";
+
+  addLine("[SYSTEM]: Trader branch bypass accepted.");
+  await wait(600);
+  runActSix();
+}
+
+async function skipActSix() {
+  if (!actSixStarted || actSixSolved) {
+    return;
+  }
+
+  switchInput1.value = safeSwitchAnswers[1];
+  switchInput2.value = safeSwitchAnswers[2];
+  switchInput3.value = safeSwitchAnswers[3];
+
+  armedSwitches.clear();
+  armedSwitches.add(1);
+  armedSwitches.add(2);
+  armedSwitches.add(3);
+
+  switchState1.textContent = "ON";
+  switchState2.textContent = "ON";
+  switchState3.textContent = "ON";
+
+  switchCard1.classList.add("armed");
+  switchCard2.classList.add("armed");
+  switchCard3.classList.add("armed");
+
+  switchInput1.disabled = true;
+  switchInput2.disabled = true;
+  switchInput3.disabled = true;
+  switchBtn1.disabled = true;
+  switchBtn2.disabled = true;
+  switchBtn3.disabled = true;
+
+  updateSwitchProgress();
+  safehavenFeedback.classList.remove("warning");
+  safehavenFeedback.textContent = "[SKIP] Safehaven switches bypassed.";
+
+  await activateReservePower();
 }
 
 function waitForThresholdSolve() {
@@ -1717,6 +1838,29 @@ chooseUtilitarianBtn.addEventListener("click", () => {
 
 chooseEgoismBtn.addEventListener("click", () => {
   chooseEgoismPath();
+});
+skipThresholdBtn.addEventListener("click", () => {
+  skipThresholdToActTwo();
+});
+
+skipAct2Btn.addEventListener("click", () => {
+  skipActTwo();
+});
+
+skipAct3Btn.addEventListener("click", () => {
+  skipActThree();
+});
+
+skipAct4Btn.addEventListener("click", () => {
+  skipActFour();
+});
+
+skipAct5Btn.addEventListener("click", () => {
+  skipActFive();
+});
+
+skipAct6Btn.addEventListener("click", () => {
+  skipActSix();
 });
 reservePowerBtn.addEventListener("click", activateReservePower);
 runDateAuditBtn.addEventListener("click", runDateAudit);
