@@ -94,6 +94,33 @@
           <p class="status" id="status">[ CONNECTION ESTABLISHED ]</p>
           <div class="dialogue" id="dialogue" aria-live="polite"></div>
 
+          <section class="threshold-room hidden" id="thresholdRoom">
+            <p class="challenge-title">THE DIGITAL THRESHOLD</p>
+            <p class="room-text">Recovered Log: Lazarus Group operators are the only recorded actors to bypass this layer.</p>
+            <p class="room-text">Historical note: Lazarus Group is a DPRK-linked cyberwarfare unit tied to high-impact intrusions including Sony Pictures.</p>
+
+            <p class="room-text">Sort the fragments into the exact readable riddle, then decrypt the single-character key.</p>
+            <div class="threshold-grid">
+              <article class="threshold-card">
+                <p class="threshold-label">Riddle Fragments</p>
+                <div class="threshold-fragments" id="thresholdFragments"></div>
+              </article>
+              <article class="threshold-card">
+                <p class="threshold-label">Assembled Riddle</p>
+                <ol class="threshold-assembled" id="thresholdAssembled"></ol>
+              </article>
+            </div>
+
+            <div class="threshold-actions">
+              <button id="thresholdReset" type="button">Reset Fragments</button>
+            </div>
+
+            <div class="challenge-row hidden" id="thresholdInputRow">
+              <input id="thresholdKey" type="text" maxlength="1" autocomplete="off" placeholder="DECRYPT KEY" />
+              <button id="thresholdSubmit" type="button">Transmit Key</button>
+            </div>
+            <p class="challenge-feedback" id="thresholdFeedback"></p>
+          </section>
           <section class="challenge hidden" id="challenge">
             <p class="challenge-title">THE DATA SET:</p>
             <pre class="data-table">ARMY: 04

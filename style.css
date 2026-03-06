@@ -1353,3 +1353,101 @@ body.act-seven .egoism-cutscene {
     min-height: 240px;
   }
 }
+
+body.act-threshold {
+  background: #000;
+}
+
+body.act-threshold .stage {
+  border-color: rgba(89, 255, 89, 0.5);
+  background: rgba(0, 0, 0, 0.95);
+  box-shadow: 0 0 36px rgba(89, 255, 89, 0.14);
+}
+
+body.act-threshold .scanlines {
+  opacity: 0.62;
+  animation: vertical-ripple 3.6s linear infinite;
+}
+
+@keyframes vertical-ripple {
+  0% {
+    transform: translateY(-18px);
+  }
+  100% {
+    transform: translateY(18px);
+  }
+}
+
+body.act-threshold .portrait {
+  filter: grayscale(1) contrast(1.35) saturate(0);
+  image-rendering: pixelated;
+}
+
+.portrait.threshold-flicker {
+  animation: hard-glitch 180ms steps(1, end) infinite;
+}
+
+.threshold-room {
+  width: 100%;
+  border: 1px solid rgba(89, 255, 89, 0.55);
+  background: rgba(0, 8, 0, 0.8);
+  padding: 0.9rem;
+}
+
+.threshold-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.threshold-card {
+  border: 1px solid rgba(89, 255, 89, 0.4);
+  background: rgba(0, 0, 0, 0.5);
+  padding: 0.7rem;
+}
+
+.threshold-label {
+  margin: 0 0 0.55rem;
+  color: #b8ffb8;
+}
+
+.threshold-fragments {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.threshold-fragment {
+  text-transform: none;
+  letter-spacing: normal;
+  text-align: left;
+  border-color: #59ff59;
+  color: #b8ffb8;
+  padding: 0.55rem 0.65rem;
+}
+
+.threshold-fragment:hover,
+.threshold-fragment:focus-visible {
+  background: rgba(89, 255, 89, 0.2);
+  color: #e9ffe9;
+}
+
+.threshold-assembled {
+  margin: 0;
+  padding-left: 1.2rem;
+  min-height: 8.4rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.threshold-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 0.8rem;
+}
+
+@media (max-width: 860px) {
+  .threshold-grid {
+    grid-template-columns: 1fr;
+  }
+}

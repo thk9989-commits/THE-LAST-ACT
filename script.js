@@ -11,6 +11,14 @@ const decryptKey = document.getElementById("decryptKey");
 const submitKey = document.getElementById("submitKey");
 const challengeFeedback = document.getElementById("challengeFeedback");
 const noiseLayer = document.getElementById("noiseLayer");
+const thresholdRoom = document.getElementById("thresholdRoom");
+const thresholdFragments = document.getElementById("thresholdFragments");
+const thresholdAssembled = document.getElementById("thresholdAssembled");
+const thresholdResetBtn = document.getElementById("thresholdReset");
+const thresholdInputRow = document.getElementById("thresholdInputRow");
+const thresholdKey = document.getElementById("thresholdKey");
+const thresholdSubmitBtn = document.getElementById("thresholdSubmit");
+const thresholdFeedback = document.getElementById("thresholdFeedback");
 
 const debtHud = document.getElementById("debtHud");
 const debtAmountLabel = document.getElementById("debtAmount");
@@ -111,6 +119,21 @@ const sceneOneLines = [
   "Unauthorized access confirmed. Initial containment failed.",
   "Core defenses were designed for large-scale payload attacks. This incident bypassed those assumptions.",
   "A compact worm variant is propagating through startup services. Internal tag: MYDOOM."
+];
+
+const thresholdDialogue = [
+  "This system has been breached by a BLACK HAT HACKER.",
+  "Our systems were built to withstand a zip bomb of 700 zetabytes. We thought we were untouchable. We were wrong.",
+  "We were not able to withstand this tiny little virus bug. It is nicknamed the MYDOOM.",
+  "To access the mainframe, provide the password for the next room. This is a transmit code loop across the system database.",
+  "Learn from previous failures. Unlock the password."
+];
+
+const thresholdRiddleOrder = [
+  "I am the beginning of Eternity, the end of time and space.",
+  "I am the beginning of every end, and the end of every place.",
+  "I am found in North Korea, but never in Pyongyang.",
+  "DECRYPT KEY: [ _ ]"
 ];
 
 const hijackBurst = "xA$7_9f::kL00p//sigmask{91}";
@@ -257,6 +280,10 @@ let currentClaimIndex = 0;
 let actSevenPath = "";
 let actSevenBranchLocked = false;
 let egoismSequenceRunning = false;
+let thresholdResolver = null;
+let thresholdSolved = false;
+let thresholdFragmentsPool = [];
+let thresholdAssembledOrder = [];
 
 const collectedArtifacts = new Set();
 const armedSwitches = new Set();
@@ -533,6 +560,139 @@ function setLogicPanel(open) {
   logicButton.setAttribute("aria-expanded", String(open));
 }
 
+function shuffleList(list) {
+  const copy = [...list];
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function renderThresholdPuzzle() {
+  thresholdFragments.innerHTML = "";
+  thresholdAssembled.innerHTML = "";
+
+  thresholdFragmentsPool.forEach((fragment, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "threshold-fragment";
+    button.textContent = fragment;
+    button.addEventListener("click", () => {
+      const selected = thresholdFragmentsPool.splice(index, 1)[0];
+      thresholdAssembledOrder.push(selected);
+      thresholdFeedback.classList.remove("warning");
+      thresholdFeedback.textContent = "";
+      renderThresholdPuzzle();
+      evaluateThresholdOrder();
+    });
+    thresholdFragments.appendChild(button);
+  });
+
+  thresholdAssembledOrder.forEach((line) => {
+    const item = document.createElement("li");
+    item.textContent = line;
+    thresholdAssembled.appendChild(item);
+  });
+}
+
+function evaluateThresholdOrder() {
+  if (thresholdAssembledOrder.length !== thresholdRiddleOrder.length) {
+    return;
+  }
+
+  const isCorrect = thresholdAssembledOrder.every((line, index) => line === thresholdRiddleOrder[index]);
+  if (!isCorrect) {
+    thresholdFeedback.classList.add("warning");
+    thresholdFeedback.textContent = "Sequence rejected. Reset and assemble the readable riddle in exact order.";
+    return;
+  }
+
+  thresholdFeedback.classList.remove("warning");
+  thresholdFeedback.textContent = "Riddle order accepted. Enter the decrypt key.";
+  thresholdInputRow.classList.remove("hidden");
+  mouth.classList.remove("talking");
+  thresholdKey.focus();
+}
+
+function resetThresholdPuzzle() {
+  thresholdSolved = false;
+  thresholdFragmentsPool = shuffleList(thresholdRiddleOrder);
+  thresholdAssembledOrder = [];
+  thresholdInputRow.classList.add("hidden");
+  thresholdKey.value = "";
+  thresholdFeedback.classList.remove("warning");
+  thresholdFeedback.textContent = "Sort the riddle to unlock key input.";
+  renderThresholdPuzzle();
+}
+
+function resolveThresholdIfReady() {
+  if (!thresholdSolved || !thresholdResolver) {
+    return;
+  }
+
+  const resolve = thresholdResolver;
+  thresholdResolver = null;
+  resolve();
+}
+
+function submitThresholdKey() {
+  if (thresholdSolved) {
+    return;
+  }
+
+  const key = thresholdKey.value.trim().toUpperCase();
+  thresholdKey.value = key;
+
+  if (thresholdAssembledOrder.length !== thresholdRiddleOrder.length) {
+    thresholdFeedback.classList.add("warning");
+    thresholdFeedback.textContent = "Assemble the full riddle before transmitting the key.";
+    return;
+  }
+
+  if (key !== "E") {
+    thresholdFeedback.classList.add("warning");
+    thresholdFeedback.textContent = "Decrypt key rejected. Re-read the riddle logic.";
+    return;
+  }
+
+  thresholdSolved = true;
+  thresholdFeedback.classList.remove("warning");
+  thresholdFeedback.textContent = "[ACCESS GRANTED] Key accepted.";
+  resolveThresholdIfReady();
+}
+
+function waitForThresholdSolve() {
+  return new Promise((resolve) => {
+    thresholdResolver = resolve;
+  });
+}
+
+async function runDigitalThreshold() {
+  document.body.classList.add("act-threshold");
+  thresholdRoom.classList.remove("hidden");
+  statusLabel.textContent = "[ DIGITAL THRESHOLD ]";
+  resetThresholdPuzzle();
+
+  for (const line of thresholdDialogue) {
+    await typeAddLine(line, "", 24);
+    await wait(520);
+  }
+
+  addLine("RECOVERED LOG:");
+  addLine('"The only known crackers to bypass this layer were the Lazarus Group."');
+  addLine("HISTORICAL NOTE: DPRK-linked cyberwarfare operators tied to Sony Pictures intrusion.");
+  addLine("Sort the riddle fragments. Then transmit the key.");
+
+  await waitForThresholdSolve();
+
+  thresholdRoom.classList.add("hidden");
+  document.body.classList.remove("act-threshold");
+  portrait.classList.add("hard-glitch");
+  await typeAddLine("[ACCESS GRANTED] Cooling Center route opened.");
+  await wait(280);
+  portrait.classList.remove("hard-glitch");
+}
 function resetFinalActState() {
   actSevenSolved = false;
   finalAuditRan = false;
@@ -1111,8 +1271,12 @@ async function runSceneOne() {
   setFanLevel(0.03);
 
   resetDialogue();
+  thresholdRoom.classList.add("hidden");
+  document.body.classList.remove("act-threshold");
   statusLabel.classList.remove("warning");
   statusLabel.textContent = "[ CONNECTION RE-ESTABLISHED ]";
+
+  await runDigitalThreshold();
 
   for (let idx = 0; idx < sceneOneLines.length; idx += 1) {
     await typeAddLine(sceneOneLines[idx]);
@@ -1125,6 +1289,8 @@ async function runSceneOne() {
 
 async function runActTwo() {
   resetDialogue();
+  thresholdRoom.classList.add("hidden");
+  document.body.classList.remove("act-threshold");
   document.body.classList.add("act-two");
   statusLabel.classList.remove("warning");
   statusLabel.textContent = "[ SECURE LAYER: 02 ]";
@@ -1198,6 +1364,8 @@ async function runActThree() {
 
   actThreeStarted = true;
   resetDialogue();
+  thresholdRoom.classList.add("hidden");
+  document.body.classList.remove("act-threshold");
   smugglerRoom.classList.add("hidden");
   merchantRoom.classList.add("hidden");
   safehavenRoom.classList.add("hidden");
@@ -1246,6 +1414,8 @@ async function runActFour() {
 
   actFourStarted = true;
   resetDialogue();
+  thresholdRoom.classList.add("hidden");
+  document.body.classList.remove("act-threshold");
   merchantRoom.classList.add("hidden");
   safehavenRoom.classList.add("hidden");
   frequencyPuzzle.classList.add("hidden");
@@ -1279,6 +1449,8 @@ async function runActFive() {
 
   actFiveStarted = true;
   resetDialogue();
+  thresholdRoom.classList.add("hidden");
+  document.body.classList.remove("act-threshold");
   smugglerRoom.classList.add("hidden");
   safehavenRoom.classList.add("hidden");
   frequencyPuzzle.classList.add("hidden");
@@ -1321,6 +1493,8 @@ async function runActSix() {
 
   actSixStarted = true;
   resetDialogue();
+  thresholdRoom.classList.add("hidden");
+  document.body.classList.remove("act-threshold");
   merchantRoom.classList.add("hidden");
   smugglerRoom.classList.add("hidden");
   frequencyPuzzle.classList.add("hidden");
@@ -1358,6 +1532,8 @@ async function runActSeven() {
 
   actSevenStarted = true;
   resetDialogue();
+  thresholdRoom.classList.add("hidden");
+  document.body.classList.remove("act-threshold");
   safehavenRoom.classList.add("hidden");
   merchantRoom.classList.add("hidden");
   smugglerRoom.classList.add("hidden");
@@ -1535,6 +1711,35 @@ reservePowerBtn.addEventListener("click", activateReservePower);
 runDateAuditBtn.addEventListener("click", runDateAudit);
 readForensicsBtn.addEventListener("click", readForensics);
 sealDoomBtn.addEventListener("click", validateDoomKey);
+thresholdResetBtn.addEventListener("click", () => {
+  resetThresholdPuzzle();
+});
+
+thresholdSubmitBtn.addEventListener("click", () => {
+  submitThresholdKey();
+});
+
+thresholdKey.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    submitThresholdKey();
+  }
+});
+
+thresholdKey.addEventListener("mouseenter", () => {
+  portrait.classList.add("threshold-flicker");
+});
+
+thresholdKey.addEventListener("mouseleave", () => {
+  portrait.classList.remove("threshold-flicker");
+});
+
+thresholdKey.addEventListener("focus", () => {
+  portrait.classList.add("threshold-flicker");
+});
+
+thresholdKey.addEventListener("blur", () => {
+  portrait.classList.remove("threshold-flicker");
+});
 doomKey.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
     validateDoomKey();
