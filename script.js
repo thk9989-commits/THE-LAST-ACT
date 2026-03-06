@@ -171,6 +171,14 @@ const ravenClaims = [
   }
 ];
 
+const concedeLines = [
+  "Impact confirmed. Your counter holds.",
+  "Raven drops leverage under pressure.",
+  "Argument chain is cracking. Keep pushing.",
+  "Threat posture collapsing. One more hit.",
+  "No valid claim remains."
+];
+
 const safeSwitchAnswers = {
   1: "11",
   2: "125000",
@@ -663,11 +671,14 @@ function submitThresholdKey() {
 }
 
 function waitForThresholdSolve() {
+  if (thresholdSolved) {
+    return Promise.resolve();
+  }
+
   return new Promise((resolve) => {
     thresholdResolver = resolve;
   });
 }
-
 async function runDigitalThreshold() {
   document.body.classList.add("act-threshold");
   thresholdRoom.classList.remove("hidden");
